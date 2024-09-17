@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+<head th:insert="~{fragments/headerfiles.html :: headerTags(loggedIn='true')}"></head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<body class="h-100">
+    <nav th:replace="~{fragments/Navbar.html :: navbar(logout='true')}"></nav>
+    <div id="main" class="h-100">
+        <div class="row">
+            <div th:replace="~{fragments/menu.html :: menu}"></div>
+            <div class="row justify-content-center" id="main-content">
+                <div th:replace="~{fragments/alert.html :: alert}"></div>
+                <div>
+                    <div class="row">
+                        <div class="col py-3">
+
+                            <button class="btn btn-primary analytics-btn" id="todayBtn">Today</button>
+                            <button class="btn btn-secondary analytics-btn" id="lastWeekBtn">Last Week</button>
+                            <button class="btn btn-secondary analytics-btn" id="lastMonthBtn">Last Month</button>
+                        </div>
+                        <div class="col py-3">
+
+                            <form class="d-inline">
+                                <input type="date" id="specificDate" class="form-control d-inline w-auto" />
+                                <button class="btn btn-secondary analytics-btn" id="searchDateBtn">Search Date</button>
+                            </form>
+                        </div>
+                        <div class="col py-3">
+
+                            <form class="d-inline ms-3">
+                                <select id="selectYear" class="form-select d-inline w-auto">
+                                    <option th:each="year:${years}" th:value="${year}" th:text="${year}"></option>
+                                </select>
+                                <button class="btn btn-secondary analytics-btn" id="searchYearBtn">Search Year</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="analytics-data" class="mb-3">
+                    <h3>Order Analytics</h3>
+                    <div class="row">
+                        <h4 class="col">Total Orders: <span id="total-orders">0</span></h4>
+                        <h4 class="col">Total Revenue: <span id="total-revenue">0</span></h4>
+                        <h4 class="col">Average Order Value: <span id="avg-order-value">0</span></h4>
+                    </div>
+                </div>
+                <div class="row" id="charts">
+                    <div id="alert-message" style="display: none;"></div>
+                    <div class="col-md-6">
+                        <canvas id="totalOrdersChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <canvas id="totalRevenueChart"></canvas>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <canvas id="avgOrderValueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+
+    const buttons = document.querySelectorAll('.analytics-btn');
+    document.addEventListener("DOMContentLoaded", function () {
+
+        fetchSpecificDateData(new Date().toLocaleDateString())
+        document.getElementById('specificDate').value = new Date().toLocaleDateString();
+
+        document.getElementById('todayBtn').addEventListener('click', function (e) {
+            buttons.forEach(button => {
+                if (button.classList.contains('btn-primary')) {
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-secondary');
+                }
+            });
+            this.classList.remove('btn-secondary');
+            this.classList.add('btn-primary');
+            fetchSpecificDateData(new Date().toLocaleDateString())
+        });
+        document.getElementById('lastWeekBtn').addEventListener('click', fetchLastWeekData);
+        document.getElementById('lastMonthBtn').addEventListener('click', fetchLastMonthData);
+        document.getElementById('searchDateBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            buttons.forEach(button => {
+                if (button.classList.contains('btn-primary')) {
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-secondary');
+                }
+            });
+            this.classList.remove('btn-secondary');
+            this.classList.add('btn-primary');
+            const date = document.getElementById('specificDate').value;
+            fetchSpecificDateData(date);
+        });
+        document.getElementById('searchYearBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            buttons.forEach(button => {
+                if (button.classList.contains('btn-primary')) {
+                    button.classList.remove('btn-primary');
+                    button.classList.add('btn-secondary');
+                }
+            });
+            this.classList.remove('btn-secondary');
+            this.classList.add('btn-primary');
+            const year = document.getElementById('selectYear').value;
+            fetchSpecificYearData(year);
+        });
+    });
+
+
+    async function fetchLastWeekData(e) {
+        buttons.forEach(button => {
+            if (button.classList.contains('btn-primary')) {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-secondary');
+            }
+        });
+        this.classList.remove('btn-secondary');
+        this.classList.add('btn-primary');
+        let alertMessage = document.getElementById('alert-message')
+        let analyticsData = document.getElementById('analytics-data')
+        alertMessage.style = 'display: none;'
+        analyticsData.style = 'display: none;'
+        const response = await fetch('http://localhost:5550/analytics/orders/last-week')
+        verifyResponseAndCallUpdateCharts(response)
+
+    }
+
+    async function fetchLastMonthData(e) {
+        buttons.forEach(button => {
+            if (button.classList.contains('btn-primary')) {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-secondary');
+            }
+        });
+        this.classList.remove('btn-secondary');
+        this.classList.add('btn-primary');
+        let alertMessage = document.getElementById('alert-message')
+        let analyticsData = document.getElementById('analytics-data')
+        alertMessage.style = 'display: none;'
+        analyticsData.style = 'display: none;'
+        const response = await fetch('http://localhost:5550/analytics/orders/last-month')
+        verifyResponseAndCallUpdateCharts(response)
+
+    }
+
+    async function fetchSpecificDateData(date) {
+        let alertMessage = document.getElementById('alert-message')
+        let analyticsData = document.getElementById('analytics-data')
+        alertMessage.style = 'display: none;'
+        analyticsData.style = 'display: none;'
+        const response = await fetch(`http://localhost:5550/analytics/orders/${date}`)
+        verifyResponseAndCallUpdateCharts(response)
+
+    }
+
+    async function fetchSpecificYearData(year) {
+        let alertMessage = document.getElementById('alert-message')
+        let analyticsData = document.getElementById('analytics-data')
+        alertMessage.style = 'display: none;'
+        analyticsData.style = 'display: none;'
+        const response = await fetch(`http://localhost:5550/analytics/orders/year/${year}`)
+        verifyResponseAndCallUpdateCharts(response)
+
+    }
+
+    async function verifyResponseAndCallUpdateCharts(response) {
+        if (response.ok && response.headers.get('Content-Type')?.includes('application/json')) {
+            const text = await response.text();
+            if (text) {
+                const result = JSON.parse(text);
+                if (result.length > 0) {
+                    updateCharts(result[0])
+                }
+                else {
+                    showAlert()
+                }
+            } else {
+                showAlert()
+            }
+        }
+        else {
+            showAlert()
+        }
+    }
+
+    function showAlert() {
+        if (window.totalOrdersInstance) window.totalOrdersInstance.destroy();
+        if (window.totalRevenueInstance) window.totalRevenueInstance.destroy();
+        if (window.avgOrderValueInstance) window.avgOrderValueInstance.destroy();
+        let alertMessage = document.getElementById('alert-message')
+        alertMessage.innerHTML = '<h1>No stats to show!</h1>'
+        alertMessage.style = 'display: block;'
+    }
+
+    function updateCharts(data) {
+        const totalOrdersChart = document.getElementById('totalOrdersChart').getContext('2d');
+        const totalRevenueChart = document.getElementById('totalRevenueChart').getContext('2d');
+        const avgOrderValueChart = document.getElementById('avgOrderValueChart').getContext('2d');
+
+        if (window.totalOrdersInstance) window.totalOrdersInstance.destroy();
+        if (window.totalRevenueInstance) window.totalRevenueInstance.destroy();
+        if (window.avgOrderValueInstance) window.avgOrderValueInstance.destroy();
+
+        let analyticsData = document.getElementById('analytics-data')
+        analyticsData.style = 'display: block;'
+        document.getElementById('total-orders').innerText = data.totalOrders;
+        document.getElementById('total-revenue').innerText = `$${data.totalRevenue}`;
+        document.getElementById('avg-order-value').innerText = `$${data.avgRevenue}`;
+
+        if (data.dailyStats) {
+            data.dailyStats.sort((a, b) => {
+                return new Date(a.date) - new Date(b.date);
+            });
+            window.totalOrdersInstance = new Chart(totalOrdersChart, {
+                type: 'bar',
+                data: {
+                    labels: data.dailyStats.map(stat => stat.date || stat.month),
+                    datasets: [{
+                        label: 'Total Orders',
+                        data: data.dailyStats.map(stat => stat.totalOrders),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            window.totalRevenueInstance = new Chart(totalRevenueChart, {
+                type: 'bar',
+                data: {
+                    labels: data.dailyStats.map(stat => stat.date || stat.month),
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: data.dailyStats.map(stat => stat.totalRevenue),
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            window.avgOrderValueInstance = new Chart(avgOrderValueChart, {
+                type: 'line',
+                data: {
+                    labels: data.dailyStats.map(stat => stat.date || stat.month),
+                    datasets: [{
+                        label: 'Average Order Value',
+                        data: data.dailyStats.map(stat => stat.totalRevenue / stat.totalOrders),
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        } else if (data.monthlyStats) {
+            window.totalOrdersInstance = new Chart(totalOrdersChart, {
+                type: 'bar',
+                data: {
+                    labels: data.monthlyStats.map(stat => stat.date || stat.month),
+                    datasets: [{
+                        label: 'Total Orders',
+                        data: data.monthlyStats.map(stat => stat.totalOrders),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            window.totalRevenueInstance = new Chart(totalRevenueChart, {
+                type: 'bar',
+                data: {
+                    labels: data.monthlyStats.map(stat => stat.date || stat.month),
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: data.monthlyStats.map(stat => stat.totalRevenue),
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            window.avgOrderValueInstance = new Chart(avgOrderValueChart, {
+                type: 'line',
+                data: {
+                    labels: data.monthlyStats.map(stat => stat.date || stat.month),
+                    datasets: [{
+                        label: 'Average Order Value',
+                        data: data.monthlyStats.map(stat => stat.totalRevenue / stat.totalOrders),
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+</html>

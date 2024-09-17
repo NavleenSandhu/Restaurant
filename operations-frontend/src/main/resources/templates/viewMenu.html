@@ -1,0 +1,56 @@
+<html lang="en" class="h-100">
+
+<head th:insert="~{fragments/headerfiles.html :: headerTags(loggedIn='true')}"></head>
+
+<body class="h-100">
+    <nav th:replace="~{fragments/Navbar.html :: navbar(logout='true')}"></nav>
+    <div id="main" class="h-100">
+        <div class="row">
+            <div th:replace="~{fragments/menu.html :: menu}"></div>
+            <div class="row justify-content-center" id="main-content">
+                <div>
+                    <div th:insert="~{fragments/alert.html :: alert}"></div>
+                    <div th:if="${items == null}" class="container my-3">
+                        <h1 th:text="Could not fetch items!"></h1>
+                    </div>
+                    <div th:else="${items == null}" class="container my-3">
+                        <a href="/addItem" class="my-2 float-end btn btn-dark btn-lg">
+                            <span class="material-symbols-outlined">add</span>
+                            Add Item
+                        </a>
+                        <table class="table table-bordered table-hover text-center my-3">
+                            <tr>
+                                <th scope="col" id="image-column"></th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Cost</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            <tr th:each="item : ${items}">
+                                <td><img class="item-image border rounded"
+                                        th:src="@{/uploads/{item_id}.{imageType}(item_id=${item.item_id}, imageType=${item.imageType})}"
+                                        alt="Image"></td>
+                                <td th:text="${item.item_name}"></td>
+                                <td th:text="${item.item_description}"></td>
+                                <td th:text="${#numbers.formatCurrency(item.cost)}"></td>
+                                <td><span th:each="category : ${categories}"
+                                        th:if="${category.category_id == item.category_id}"
+                                        th:text="${category.category_name}"></span></td>
+                                <td>
+                                    <div><a th:href="@{/edit/{id}(id=${item.item_id})}"
+                                            class="btn btn-dark m-2">Edit</a>
+                                        <a th:href="@{/delete/{id}(id=${item.item_id})}"
+                                            class="btn btn-dark m-2">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

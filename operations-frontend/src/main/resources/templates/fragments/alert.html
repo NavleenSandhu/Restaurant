@@ -1,0 +1,4 @@
+<div th:fragment="alert" th:if="${message != null}"
+    th:class="'alert alert-'+${status}+' alert-dismissible fade show my-2'" role="alert"><span
+        th:text="${message}"></span><button type="button" id="close" class="btn-close d-hidden" data-bs-dismiss="alert"
+        aria-label="Close"></button></div>

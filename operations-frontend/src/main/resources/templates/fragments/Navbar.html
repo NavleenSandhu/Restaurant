@@ -1,0 +1,14 @@
+<nav th:fragment="navbar(logout)" class="navbar bg-dark">
+    <div class="container-fluid">
+        <ul class="navbar-nav d-flex flex-row justify-content-between w-100">
+            <li class="nav-item ">
+                <h2>Admin Dashboard</h2>
+            </li>
+            <li class="nav-item">
+                <a th:if="${logout}" href="/logout" class="nav-link">
+                    <button class="btn btn-light">Logout</button>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

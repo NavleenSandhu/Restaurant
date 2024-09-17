@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head th:insert="~{fragments/headerfiles.html :: headerTags(loggedIn='false')}">
+</head>
+
+
+<body>
+    <nav th:replace="~{fragments/Navbar.html :: navbar(logout='false')}"></nav>
+    <div id="main" class="h-100">
+        <div th:replace="~{fragments/alert.html :: alert}"></div>
+        <div class="container d-flex justify-content-center mt-5">
+            <div class="card my-5" style="width: 18rem;">
+                <div class="card-body p-4">
+                    <form action="/register" method="post" th:object="${user}">
+                        <div class="my-2">
+                            <input class="form-control" type="text" th:field="*{email}" placeholder="Email"><br>
+                        </div>
+                        <div class="my-2">
+                            <input class="form-control" type="password" th:field="*{password}"
+                                placeholder="Password"><br>
+                        </div>
+                        <div class="my-2">
+                            <input class="btn btn-dark" type="submit" value="Register">
+                        </div>
+                        <p class="my-2">Already have an account? <a href="/login">Login</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let closeBtn = document.getElementById('close')
+        if (closeBtn) {
+            setTimeout(() => {
+                closeBtn.click()
+            }, 5000)
+        }
+    })
+</script>
+
+</html>

@@ -1,0 +1,9 @@
+<form th:fragment="categoryForm(action, id, required, buttonValue)" th:action="@{{action}(action=${action})}"
+    method="post">
+    <input th:if="${id}" type="hidden" name="category_id" th:value="${category_id}">
+    <div class="my-3">
+        <input type="text" class="form-control" name="category_name" id="category_name" placeholder="Category Name"
+            th:required="${required}">
+    </div>
+    <input class="btn btn-dark" type="submit" th:value="${buttonValue}">
+</form>

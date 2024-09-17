@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+<head th:insert="~{fragments/headerfiles.html :: headerTags(loggedIn='true')}"></head>
+
+<body class="h-100">
+    <nav th:replace="~{fragments/Navbar.html :: navbar(logout='true')}"></nav>
+    <div id="main" class="h-100">
+        <div class="row">
+            <div th:replace="~{fragments/menu.html :: menu}"></div>
+            <div class="row justify-content-center" id="main-content">
+                <div th:replace="~{fragments/alert.html :: alert}"></div>
+                <div class="row row-cols-1 justify-content-between my-3">
+                    <div
+                        th:replace="~{fragments/card.html :: card(title='View Menu', src='/images/menu.png',href='/viewItems', action='View')}">
+                    </div>
+                    <div
+                        th:replace="~{fragments/card.html :: card(title='Add an Item', src='/images/addItem.png', href='/addItem',action='Add')}">
+                    </div>
+                    <div
+                        th:replace="~{fragments/card.html :: card(title='View Categories', src='/images/categories.png', href='/viewCategories',action='View')}">
+                    </div>
+                    <div
+                        th:replace="~{fragments/card.html :: card(title='View Analytics', src='/images/analytics.png', href='/analytics',action='View')}">
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Order Confirmation</title>
+</head>
+
+<body style="background-color: #F3F4F6; color: #4B5563; font-family: sans-serif; margin: 0; padding: 0;">
+    <div
+        style="max-width: 600px; margin: 20px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div style="background-color: orange; padding: 16px;">
+            <h1 style="font-size: 1.5rem; font-weight: bold; color: white;">Restaurant</h1>
+        </div>
+        <div class="p-4">
+            <h2 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 8px;">Thank you <span
+                    th:text="${customer.custName}"></span> for placing an
+                order!</h2>
+        </div>
+        <div class="p-4">
+            <h2 class="text-lg font-bold mb-2">Order Details</h2>
+            <ul>
+                <li th:each="item : ${cartItems}"
+                    style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #E5E7EB;">
+                    <span th:text="${item.quantity} + ' x ' + ${item.item_name}"></span><span> </span>
+                    (<span th:text="${#numbers.formatCurrency(item.cost)}"></span>)
+                </li>
+            </ul>
+
+            <div
+                style="display: flex; justify-content: space-between; border-top: 1px solid #E5E7EB; padding-top: 8px;">
+                <span>Subtotal: </span>
+                <span th:text="${#numbers.formatCurrency(subtotal)}"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Tax: </span>
+                <span th:text="${#numbers.formatCurrency(tax)}"></span>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; font-weight: bold; border-top: 1px solid #E5E7EB; margin-top: 8px; padding-top: 8px;">
+                <span>Total: </span>
+                <span th:text="${#numbers.formatCurrency(total)}"></span>
+            </div>
+        </div>
+
+
+    </div>
+</body>
+
+</html>

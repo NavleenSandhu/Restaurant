@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Signup Confirmation</title>
+</head>
+
+<body style="background-color: #F3F4F6; color: #4B5563; font-family: sans-serif; margin: 0; padding: 0;">
+    <div
+        style="max-width: 600px; margin: 20px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div style="background-color: orange; padding: 16px;">
+            <h1 style="font-size: 1.5rem; font-weight: bold; color: white;">Restaurant</h1>
+        </div>
+        <div class="p-4">
+            <h2 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 8px;">Thank you <span
+                    th:text="${customer.custName}"></span> for signing up with us. We look forward to serve you!</h2>
+        </div>
+    </div>
+</body>
+
+</html>
